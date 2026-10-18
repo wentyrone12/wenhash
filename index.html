@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0f1d" />
+  <meta name="description" content="WenHash is a browser-based text converter for hashing, salted hashing, and password-based encryption." />
+  <title>WenHash — Text Translator & Crypto Converter</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-a" aria-hidden="true"></div>
+  <div class="ambient ambient-b" aria-hidden="true"></div>
+  <div class="app-shell">
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#converter" data-page-link="converter" aria-label="WenHash home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="brand-copy"><strong>WEN<span>HASH</span></strong><small>LOCAL CRYPTO LAB</small></span>
+      </a>
+      <div class="nav-caption">WORKSPACE</div>
+      <nav class="side-nav">
+        <button class="nav-item active" type="button" data-page="converter"><span class="nav-icon">⌘</span><span>Converter</span><span class="nav-arrow">↗</span></button>
+        <button class="nav-item" type="button" data-page="reverse"><span class="nav-icon">⤺</span><span>Reverse / Verify</span></button>
+        <div class="nav-caption nav-caption-spaced">LEARN</div>
+        <button class="nav-item" type="button" data-page="how"><span class="nav-icon">◉</span><span>How it works</span></button>
+        <button class="nav-item" type="button" data-page="purpose"><span class="nav-icon">◇</span><span>Purpose &amp; limits</span></button>
+        <button class="nav-item" type="button" data-page="about"><span class="nav-icon">ⓘ</span><span>About WenHash</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="privacy-card"><span class="privacy-icon">✦</span><div><strong>Local by design</strong><p>Your text is processed in this browser. No upload feature is included.</p></div></div>
+        <button class="nav-item settings-nav" type="button" data-page="settings"><span class="nav-icon">⚙</span><span>Settings</span></button>
+        <div class="sidebar-version"><span class="status-dot"></span> WENHASH · V2.1</div>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><span></span><span></span><span></span></button>
+          <div class="breadcrumb"><span>WENHASH</span><b>/</b><strong id="breadcrumbPage">CONVERTER</strong></div>
+        </div>
+        <div class="topbar-actions">
+          <span class="local-badge"><i></i> LOCAL PROCESSING</span>
+          <button class="icon-button" id="quickThemeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">☼</button>
+          <button class="profile-chip" type="button" data-page="about" aria-label="About WenHash"><span class="profile-avatar">W</span><span>WenHash</span></button>
+        </div>
+      </header>
+
+      <main class="page-content">
+        <!-- CONVERTER -->
+        <section class="page-view active" id="page-converter" data-view="converter">
+          <section class="page-intro">
+            <div class="eyebrow"><span class="eyebrow-line"></span> TEXT IN. CRYPTO OUTPUT.</div>
+            <h1>One message.<br /><span>Convert it. Convert it back.</span></h1>
+            <p>Choose hashing, salted hashing, encryption, Base64, or Hex. Return supported reversible formats to text inside WenHash itself—without sending messages to a server.</p>
+            <div class="intro-stats"><span><b>01</b> Hash</span><span><b>02</b> Encrypt</span><span><b>03</b> Encode / Decode</span></div>
+          </section>
+
+          <div class="converter-layout">
+            <section class="surface input-surface" aria-labelledby="converterTitle">
+              <div class="surface-heading">
+                <div><div class="step-label">STEP 01 / SOURCE</div><h2 id="converterTitle">Enter your message</h2></div>
+                <span class="heading-symbol">✎</span>
+              </div>
+              <label class="field-label" for="sourceText">MESSAGE / TEXT</label>
+              <div class="text-input-wrap">
+                <textarea id="sourceText" maxlength="20000" spellcheck="false" placeholder="Type or paste anything here…&#10;&#10;Example: my private note goes here"></textarea>
+                <span class="input-corner">W/H</span>
+              </div>
+              <div class="field-meta"><span id="charCount">0 characters</span><button id="clearText" class="quiet-button" type="button">Clear text ×</button></div>
+
+              <div class="mode-label-row"><span class="field-label">CHOOSE A TRANSFORMATION</span><span class="mode-help-label">Select one mode</span></div>
+              <div class="mode-switch" role="group" aria-label="Transformation mode">
+                <button class="mode-option active" id="modeHash" type="button" data-mode="hash" aria-pressed="true"><span class="mode-symbol">#</span><strong>Hash</strong><small>Fast digest</small></button>
+                <button class="mode-option" id="modeSalted" type="button" data-mode="salted" aria-pressed="false"><span class="mode-symbol">⟡</span><strong>Hash + salt</strong><small>Verify only</small></button>
+                <button class="mode-option" id="modeEncrypt" type="button" data-mode="encrypt" aria-pressed="false"><span class="mode-symbol">⌑</span><strong>Encrypt + salt</strong><small>Can decrypt</small></button>
+                <button class="mode-option" id="modeBase64" type="button" data-mode="base64" aria-pressed="false"><span class="mode-symbol">B64</span><strong>Base64</strong><small>Reversible encoding</small></button>
+                <button class="mode-option" id="modeHex" type="button" data-mode="hex" aria-pressed="false"><span class="mode-symbol">0x</span><strong>Hex</strong><small>Reversible encoding</small></button>
+              </div>
+
+              <div id="hashOptions" class="mode-options">
+                <label class="field-label" for="hashAlgorithm">HASH ALGORITHM</label>
+                <div class="select-wrap"><select id="hashAlgorithm"><option value="SHA-256">SHA-256 · 256-bit</option><option value="SHA-384">SHA-384 · 384-bit</option><option value="SHA-512">SHA-512 · 512-bit</option></select><span>⌄</span></div>
+                <p class="field-hint">One-way fingerprint. It cannot be translated back to text. Use Verify hash to test a candidate message.</p>
+              </div>
+
+              <div id="saltedOptions" class="mode-options" hidden>
+                <div class="option-info"><span class="option-info-icon">⟡</span><div><strong>PBKDF2-HMAC-SHA-256</strong><p>Uses a new random 16-byte salt and 600,000 iterations.</p></div></div>
+                <p class="field-hint">One-way fingerprint plus random salt. It cannot be translated back to text; save the full record to verify a candidate later.</p>
+              </div>
+
+              <div id="encryptOptions" class="mode-options" hidden>
+                <label class="field-label" for="encryptPassword">ENCRYPTION PASSWORD</label>
+                <div class="password-wrap"><input id="encryptPassword" type="password" autocomplete="new-password" maxlength="256" placeholder="Create a strong passphrase (12+ characters)"/><button type="button" class="show-password" data-password-target="encryptPassword" aria-label="Show password">Show</button></div>
+                <p class="field-hint">AES-256-GCM encrypts the message. To restore the text, use Decrypt with the same password and full record.</p>
+              </div>
+              <div id="base64Options" class="mode-options" hidden><div class="option-info"><span class="option-info-icon">B64</span><div><strong>Base64 encoding</strong><p>Reversible text encoding, not encryption. Use Decode text to restore the original message.</p></div></div></div>
+              <div id="hexOptions" class="mode-options" hidden><div class="option-info"><span class="option-info-icon">0x</span><div><strong>Hexadecimal encoding</strong><p>Encodes the UTF-8 bytes as hex. Use Decode text to restore the original message.</p></div></div></div>
+
+              <button id="convertBtn" class="primary-button" type="button"><span class="button-leading">✳</span><span id="convertBtnText">Generate SHA-256 hash</span><span class="button-trailing">↗</span></button>
+              <div class="safe-note"><span>◆</span> Your input is processed locally using the browser Web Crypto API.</div>
+              <div id="convertMessage" class="notice" role="status" hidden></div>
+            </section>
+
+            <section class="surface output-surface" aria-labelledby="resultTitle">
+              <div class="surface-heading result-heading">
+                <div><div class="step-label">STEP 02 / RESULT</div><h2 id="resultTitle">Your output</h2></div>
+                <span class="state-pill" id="resultState"><i></i> READY</span>
+              </div>
+              <div class="output-card">
+                <div class="output-card-head"><span id="outputTypeLabel">SHA-256 DIGEST</span><span class="output-live"><i></i> OUTPUT</span></div>
+                <pre id="outputText" class="output-text empty-output" tabindex="0" aria-live="polite">Your generated output will appear here…</pre>
+                <div class="output-card-foot"><span id="outputLength">0 characters</span><button id="copyOutput" class="copy-button" type="button" disabled><span>▢</span> Copy output</button></div>
+              </div>
+              <div class="output-facts">
+                <div class="fact-tile"><span>TRANSFORMATION</span><strong id="factMode">SHA-256</strong></div>
+                <div class="fact-tile"><span>SALT</span><strong id="factSalt">Not used</strong></div>
+                <div class="fact-tile"><span>ENCRYPTION</span><strong id="factEncryption">None</strong></div>
+                <div class="fact-tile"><span>STATUS</span><strong id="factStatus">Waiting for input</strong></div>
+              </div>
+              <div class="output-actions"><div><strong>Take your output with you</strong><p id="outputActionHint">Copy the digest or use it for an integrity check.</p></div><div class="action-buttons"><button id="copyRecord" class="secondary-button" type="button" disabled>▢ Copy record</button><button id="downloadRecord" class="secondary-button" type="button" disabled>↓ Export</button></div></div>
+              <div class="output-bottom-note"><span class="tiny-lock">⌑</span><span><b>Convert back:</b> use Decode text for Base64/Hex, or Decrypt for encrypted data. Hashes and salts are not reversible—use Verify hash instead.</span></div>
+            </section>
+          </div>
+          <div class="quick-tip"><div class="tip-icon">i</div><div><strong>Keep the difference in mind</strong><p><b>Hash</b> means one-way fingerprint. <b>Salt</b> is a random value included in hashing/key derivation. <b>Encryption</b> can be reversed only with the correct key/password and complete record.</p></div><button type="button" class="tip-link" data-page="how">Learn more →</button></div>
+        </section>
+
+        <!-- REVERSE / VERIFY -->
+        <section class="page-view" id="page-reverse" data-view="reverse" hidden>
+          <section class="page-intro compact-intro"><div class="eyebrow"><span class="eyebrow-line"></span> REVERSE WHAT CAN BE REVERSED</div><h1>Decrypt or<br /><span>verify a record.</span></h1><p>Encrypted text can be restored with its password. Hashes and salts do not contain recoverable plaintext, but hashes can verify a text you already know.</p></section>
+          <div class="reverse-switch" role="tablist" aria-label="Reverse operation">
+            <button class="reverse-tab active" type="button" data-reverse-tab="decode" role="tab" aria-selected="true"><span>↶</span> Decode text</button>
+            <button class="reverse-tab" type="button" data-reverse-tab="decrypt" role="tab" aria-selected="false"><span>⌑</span> Decrypt</button>
+            <button class="reverse-tab" type="button" data-reverse-tab="verify" role="tab" aria-selected="false"><span>#</span> Verify hash</button>
+            <button class="reverse-tab" type="button" data-reverse-tab="salt" role="tab" aria-selected="false"><span>⟡</span> Salt info</button>
+          </div>
+          <section class="surface reverse-panel" id="reverseDecode" data-reverse-panel="decode">
+            <div class="surface-heading"><div><div class="step-label">REVERSIBLE TEXT CONVERSION</div><h2>Encoded output → original text</h2></div><span class="heading-symbol">↶</span></div>
+            <p class="body-copy">Paste output created with WenHash Base64 or Hex mode. If you paste an encrypted JSON record, this panel can send it to Decrypt. Hashes and salts cannot be decoded to their original message.</p>
+            <label class="field-label" for="decodeFormat">OUTPUT FORMAT</label>
+            <div class="select-wrap"><select id="decodeFormat"><option value="base64">Base64</option><option value="hex">Hexadecimal</option></select><span>⌄</span></div>
+            <label class="field-label spaced-label" for="decodeInput">ENCODED TEXT OR EXPORTED JSON RECORD</label>
+            <textarea id="decodeInput" class="code-input" maxlength="200000" spellcheck="false" placeholder="Paste Base64 or Hex output here…"></textarea>
+            <button id="decodeBtn" class="primary-button" type="button"><span class="button-leading">↶</span><span>Decode to text</span><span class="button-trailing">↗</span></button>
+            <div id="decodeMessage" class="notice" role="status" hidden></div>
+            <label class="field-label spaced-label" for="decodedOutput">TRANSLATED TEXT</label>
+            <textarea id="decodedOutput" class="recovered-output" readonly placeholder="Your translated text will appear here…"></textarea>
+            <div class="inline-actions"><button id="copyDecoded" class="secondary-button" type="button" disabled>▢ Copy translated text</button><button id="clearDecode" class="quiet-button" type="button">Clear fields</button></div>
+            <div class="explain-banner decode-limit-note"><span>!</span><p><b>Important:</b> SHA hashes and salted hashes are one-way fingerprints, not encoded messages. Choose Verify hash for a match check. For encrypted messages, use Decrypt with the original password.</p></div>
+          </section>
+          <section class="surface reverse-panel" id="reverseDecrypt" data-reverse-panel="decrypt">
+            <div class="surface-heading"><div><div class="step-label">REVERSIBLE MODE</div><h2>Encrypted data → original text</h2></div><span class="heading-symbol">⌑</span></div>
+            <p class="body-copy">Paste a WenHash encrypted JSON record and enter the same password used when it was created.</p>
+            <label class="field-label" for="decryptRecordInput">ENCRYPTED JSON RECORD</label>
+            <textarea id="decryptRecordInput" class="code-input" maxlength="200000" spellcheck="false" placeholder="Paste the complete WENHASH-ENC-1 JSON record here…"></textarea>
+            <label class="field-label spaced-label" for="decryptPassword">DECRYPTION PASSWORD</label>
+            <div class="password-wrap"><input id="decryptPassword" type="password" autocomplete="current-password" maxlength="256" placeholder="Enter the original encryption password"/><button type="button" class="show-password" data-password-target="decryptPassword" aria-label="Show password">Show</button></div>
+            <button id="decryptBtn" class="primary-button" type="button"><span class="button-leading">⌑</span><span>Unlock &amp; decrypt</span><span class="button-trailing">↗</span></button>
+            <div id="decryptMessage" class="notice" role="status" hidden></div>
+            <label class="field-label spaced-label" for="decryptedOutput">RECOVERED TEXT</label>
+            <textarea id="decryptedOutput" class="recovered-output" readonly placeholder="Decrypted text will appear here after successful authentication…"></textarea>
+            <div class="inline-actions"><button id="copyDecrypted" class="secondary-button" type="button" disabled>▢ Copy recovered text</button><button id="clearDecrypt" class="quiet-button" type="button">Clear fields</button></div>
+          </section>
+          <section class="surface reverse-panel" id="reverseVerify" data-reverse-panel="verify" hidden>
+            <div class="surface-heading"><div><div class="step-label">ONE-WAY MODE</div><h2>Known text → hash verification</h2></div><span class="heading-symbol">#</span></div>
+            <div class="explain-banner"><span>!</span><p>A hash cannot be decoded into its original text. Instead, enter a text you suspect is the original and compare it to a hash or saved WenHash salted-hash record.</p></div>
+            <label class="field-label" for="candidateText">CANDIDATE ORIGINAL TEXT</label>
+            <textarea id="candidateText" class="normal-input" maxlength="20000" spellcheck="false" placeholder="Enter the text you want to test…"></textarea>
+            <label class="field-label spaced-label" for="hashRecordInput">HASH VALUE OR WENHASH HASH RECORD (JSON)</label>
+            <textarea id="hashRecordInput" class="code-input" maxlength="100000" spellcheck="false" placeholder="Paste a SHA digest or a WENHASH-HASH-1 JSON record…"></textarea>
+            <div class="verify-controls"><div><label class="field-label" for="verifyAlgorithm">IF USING A RAW SHA DIGEST</label><div class="select-wrap"><select id="verifyAlgorithm"><option value="SHA-256">SHA-256</option><option value="SHA-384">SHA-384</option><option value="SHA-512">SHA-512</option></select><span>⌄</span></div></div><button id="verifyBtn" class="primary-button verify-action" type="button"><span class="button-leading">✓</span><span>Verify candidate</span><span class="button-trailing">↗</span></button></div>
+            <div id="verifyMessage" class="notice" role="status" hidden></div>
+          </section>
+          <section class="surface reverse-panel" id="reverseSalt" data-reverse-panel="salt" hidden>
+            <div class="surface-heading"><div><div class="step-label">RANDOM VALUE / NOT A CIPHER</div><h2>A salt is not a hidden message</h2></div><span class="heading-symbol">⟡</span></div>
+            <div class="salt-visual"><div class="salt-big-icon">⟡</div><div><h3>Salt alone → text is not possible</h3><p>A salt is a public random input used along with a candidate text to create a salted hash or derive a key. It does not encode the original text and is not a decryption key.</p></div></div>
+            <div class="salt-comparison"><div><span>WHAT YOU HAVE</span><strong>Salt + hash</strong><p>You can check whether a candidate text matches the saved hash record.</p></div><div><span>WHAT YOU NEED TO RECOVER TEXT</span><strong>Encrypted record + password</strong><p>Use AES-GCM decryption with the correct password and complete record.</p></div></div>
+            <button type="button" class="primary-button" data-page="verify"><span class="button-leading">#</span><span>Verify a salted hash instead</span><span class="button-trailing">↗</span></button>
+          </section>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="page-view" id="page-how" data-view="how" hidden>
+          <section class="page-intro compact-intro"><div class="eyebrow"><span class="eyebrow-line"></span> CRYPTOGRAPHY, WITHOUT THE MYSTERY</div><h1>How WenHash<br /><span>works.</span></h1><p>Each mode solves a different problem. Choose based on whether you need a fingerprint, a salted verifier, or reversible confidentiality.</p></section>
+          <div class="learn-grid">
+            <article class="surface learn-card"><div class="learn-icon hash-icon">#</div><div class="step-label">01 / HASH</div><h2>A one-way fingerprint</h2><p>A hash function maps input text to a fixed-size digest. A tiny change in the input changes the output, but there is no standard “decrypt” operation.</p><div class="mini-flow"><span>Plain text</span><b>→</b><span>SHA-256</span><b>→</b><span>Digest</span></div><ul><li>Same text gives the same SHA digest.</li><li>Can check integrity or compare known candidates.</li><li>Not suitable by itself for storing passwords.</li></ul></article>
+            <article class="surface learn-card"><div class="learn-icon salt-icon">⟡</div><div class="step-label">02 / SALTED HASH</div><h2>Same text, different record</h2><p>WenHash creates a random 16-byte salt and runs PBKDF2-HMAC-SHA-256 for 600,000 iterations. The record keeps both the salt and derived hash.</p><div class="mini-flow"><span>Text + salt</span><b>→</b><span>PBKDF2</span><b>→</b><span>Record</span></div><ul><li>The salt is not secret and cannot be decoded.</li><li>Save the full record to verify the text later.</li><li>Salted hash output is still one-way.</li></ul></article>
+            <article class="surface learn-card"><div class="learn-icon encrypt-icon">⌑</div><div class="step-label">03 / ENCRYPTION</div><h2>Confidential and reversible</h2><p>AES-256-GCM protects the message with authenticated encryption. PBKDF2 derives a key from your password and a random salt; a random IV is used for AES-GCM.</p><div class="mini-flow"><span>Plain text</span><b>→</b><span>AES-GCM</span><b>→</b><span>Ciphertext</span></div><ul><li>Needs the same password and complete JSON record to decrypt.</li><li>Authentication fails if the password is wrong or data is changed.</li><li>Keep the password separate from the record.</li></ul></article>
+          </div>
+          <div class="warning-surface"><span class="warning-icon">!</span><div><strong>Important security limit</strong><p>Nothing can promise a tool is “unhackable.” A weak password can be guessed, and malware or an unsafe device can expose your input. WenHash is an educational local-browser tool, not an independently audited security product.</p></div></div>
+        </section>
+
+        <!-- PURPOSE -->
+        <section class="page-view" id="page-purpose" data-view="purpose" hidden>
+          <section class="page-intro compact-intro"><div class="eyebrow"><span class="eyebrow-line"></span> USE THE RIGHT TOOL FOR THE JOB</div><h1>Purpose &amp;<br /><span>limitations.</span></h1><p>WenHash is designed to help you learn how text transformation and basic cryptographic concepts differ.</p></section>
+          <div class="purpose-list">
+            <article class="surface purpose-row"><span class="purpose-index">01</span><div><h2>Text fingerprinting</h2><p>Generate SHA-256, SHA-384, or SHA-512 digests for demonstrations and basic integrity checks.</p></div><span class="purpose-tag">HASH</span></article>
+            <article class="surface purpose-row"><span class="purpose-index">02</span><div><h2>Salted hash verification</h2><p>Create a slow PBKDF2-derived hash with a fresh random salt, export the record, and verify candidate text later.</p></div><span class="purpose-tag">HASH + SALT</span></article>
+            <article class="surface purpose-row"><span class="purpose-index">03</span><div><h2>Reversible message protection</h2><p>Encrypt text locally and later decrypt its record using a strong password. Losing the password means losing access to the plaintext.</p></div><span class="purpose-tag">ENCRYPT</span></article>
+            <article class="surface purpose-row"><span class="purpose-index">04</span><div><h2>Learning, not a security certification</h2><p>Useful for a student project and local experiments. It is not independently audited and should not be the only protection for high-value secrets or production accounts.</p></div><span class="purpose-tag">EDUCATION</span></article>
+          </div>
+          <div class="notice warning-notice"><strong>What cannot be done?</strong><p>There is no genuine “hash to original text” or “salt to original text” converter. Anyone claiming to reverse every arbitrary hash or salt is misleading you. The safe and valid alternatives are candidate verification and decryption of actual encrypted data.</p></div>
+        </section>
+
+        <!-- ABOUT -->
+        <section class="page-view" id="page-about" data-view="about" hidden>
+          <section class="page-intro compact-intro"><div class="eyebrow"><span class="eyebrow-line"></span> ABOUT THIS PROJECT</div><h1>Small tool.<br /><span>Clear principles.</span></h1><p>WenHash is a browser-based learning lab built around common cryptographic standards rather than a secret, custom-made algorithm.</p></section>
+          <div class="surface about-card"><div class="about-brand"><span class="brand-mark large-mark"><i></i><i></i><i></i><i></i></span><div><strong>WEN<span>HASH</span></strong><small>LOCAL CRYPTO LAB · VERSION 2.1</small></div></div><p>WenHash demonstrates how hashing, salting, and password-based encryption are different. No external libraries or server endpoint are required for its core operations; it uses the browser's native Web Crypto API.</p><div class="about-specs"><div><span>FAST DIGEST</span><strong>SHA-256 / 384 / 512</strong></div><div><span>SALTED HASH</span><strong>PBKDF2 · SHA-256</strong></div><div><span>ENCRYPTION</span><strong>AES-256-GCM</strong></div><div><span>KEY DERIVATION</span><strong>600,000 iterations</strong></div></div><div class="warning-surface about-warning"><span class="warning-icon">!</span><div><strong>Privacy and safety</strong><p>Processing stays in the browser page. The app does not upload your text, but a compromised device, malicious extension, or clipboard monitor can still expose it. Do not enter secrets on a device you do not trust.</p></div></div></div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="page-view" id="page-settings" data-view="settings" hidden>
+          <section class="page-intro compact-intro"><div class="eyebrow"><span class="eyebrow-line"></span> MAKE IT YOUR SPACE</div><h1>Appearance &amp;<br /><span>preferences.</span></h1><p>Customize WenHash's look and save your preferences on this device.</p></section>
+          <div class="settings-layout">
+            <section class="surface settings-card"><div class="surface-heading"><div><div class="step-label">DISPLAY</div><h2>Appearance</h2></div><span class="heading-symbol">◐</span></div>
+              <div class="setting-row setting-theme-row"><div><strong>Theme mode</strong><p>Choose the overall interface appearance.</p></div><div class="theme-choice-group" role="group" aria-label="Theme mode"><button type="button" class="theme-choice active" data-theme-choice="dark"><span class="theme-preview preview-dark"><i></i></span><span>Dark</span></button><button type="button" class="theme-choice" data-theme-choice="light"><span class="theme-preview preview-light"><i></i></span><span>Light</span></button><button type="button" class="theme-choice" data-theme-choice="custom"><span class="theme-preview preview-custom"><i></i></span><span>Custom</span></button></div></div>
+              <div id="customAppearance" class="custom-appearance" hidden><div class="setting-row"><div><strong>Accent color</strong><p>Pick the color used for highlights and active controls.</p></div><label class="color-picker-wrap"><input id="accentColor" type="color" value="#79e6c2" aria-label="Choose accent color"/><span id="accentHex">#79E6C2</span></label></div><div class="setting-row"><div><strong>Custom base</strong><p>Use a dark or light background with your accent color.</p></div><div class="select-wrap base-select"><select id="customBase"><option value="dark">Dark base</option><option value="light">Light base</option></select><span>⌄</span></div></div></div>
+              <div class="setting-row"><div><strong>Interface density</strong><p>Adjust the spacing throughout the app.</p></div><div class="density-options" role="group" aria-label="Interface density"><button type="button" data-density="comfortable" class="density-button active">Comfortable</button><button type="button" data-density="compact" class="density-button">Compact</button></div></div>
+              <div class="settings-footer"><span id="settingsSaveState" class="save-state"><i></i> Preferences saved on this device</span><button id="resetSettings" class="secondary-button" type="button">Reset preferences</button></div>
+            </section>
+            <aside class="surface settings-aside"><div class="settings-aside-icon">✦</div><h3>Your settings stay local</h3><p>Appearance preferences are saved in this browser's local storage. They do not include the text you convert, your password, or your generated records.</p><div class="setting-mini-row"><span>Theme</span><strong id="currentThemeLabel">Dark</strong></div><div class="setting-mini-row"><span>Density</span><strong id="currentDensityLabel">Comfortable</strong></div></aside>
+          </div>
+        </section>
+
+        <footer class="app-footer"><span>WENHASH <b>·</b> LOCAL CRYPTO LAB</span><span>Built for learning. Use cryptography responsibly.</span><button type="button" data-page="about">About this project ↗</button></footer>
+      </main>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
