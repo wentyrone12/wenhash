@@ -52,3 +52,13 @@ How to translate back:
 
 For AES encryption, use Reverse / Verify > Decrypt and enter the exact password.
 For SHA/PBKDF2 hashes, the app cannot recover the original. Use Verify hash with a candidate original text. Salt alone is a random value and cannot reconstruct the message.
+
+
+WENHASH V2.2 — ENHANCED
+- Double password hashing: password -> PBKDF2-SHA-512 (210k) -> hex -> PBKDF2-SHA-256 (600k) -> AES-256-GCM key. New records use format WENHASH-ENC-2. Old WENHASH-ENC-1 records still decrypt.
+- Mobile: bottom nav bar, 16px inputs (no iOS zoom), 46px touch targets, safe-area support, sticky topbar.
+- Settings: font style (7 fonts), text size (S/M/L/XL), language (English/Filipino/Español), Assistive Touch, pop-up results, loading effects, privacy shield.
+- Assistive Touch: draggable floating logo, snaps to edges, stays on every screen and on browser Back, hidden only by Exit.
+- Loaders and pop-ups: boot splash, busy overlay, result dialogs, exit confirmation + lock screen.
+- Privacy shield: blur on tab switch, clear passwords after idle, autofill/password-manager hints disabled on fields.
+New files: enhance.css, enhance.js. Fonts load from Google Fonts (needs internet; falls back to system fonts offline).

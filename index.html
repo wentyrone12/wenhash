@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0f1d" />
   <meta name="description" content="WenHash is a browser-based text converter for hashing, salted hashing, and password-based encryption." />
   <title>WenHash — Text Translator & Crypto Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&family=Merriweather:wght@400;700&family=Nunito:wght@400;700;800&family=Poppins:wght@400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="enhance.css" />
   <script src="app.js" defer></script>
+  <script src="enhance.js" defer></script>
 </head>
 <body>
   <div class="ambient ambient-a" aria-hidden="true"></div>
@@ -31,7 +35,7 @@
       <div class="sidebar-bottom">
         <div class="privacy-card"><span class="privacy-icon">✦</span><div><strong>Local by design</strong><p>Your text is processed in this browser. No upload feature is included.</p></div></div>
         <button class="nav-item settings-nav" type="button" data-page="settings"><span class="nav-icon">⚙</span><span>Settings</span></button>
-        <div class="sidebar-version"><span class="status-dot"></span> WENHASH · V2.1</div>
+        <div class="sidebar-version"><span class="status-dot"></span> WENHASH · V2.2</div>
       </div>
     </aside>
 
@@ -218,6 +222,10 @@
               <div class="setting-row setting-theme-row"><div><strong>Theme mode</strong><p>Choose the overall interface appearance.</p></div><div class="theme-choice-group" role="group" aria-label="Theme mode"><button type="button" class="theme-choice active" data-theme-choice="dark"><span class="theme-preview preview-dark"><i></i></span><span>Dark</span></button><button type="button" class="theme-choice" data-theme-choice="light"><span class="theme-preview preview-light"><i></i></span><span>Light</span></button><button type="button" class="theme-choice" data-theme-choice="custom"><span class="theme-preview preview-custom"><i></i></span><span>Custom</span></button></div></div>
               <div id="customAppearance" class="custom-appearance" hidden><div class="setting-row"><div><strong>Accent color</strong><p>Pick the color used for highlights and active controls.</p></div><label class="color-picker-wrap"><input id="accentColor" type="color" value="#79e6c2" aria-label="Choose accent color"/><span id="accentHex">#79E6C2</span></label></div><div class="setting-row"><div><strong>Custom base</strong><p>Use a dark or light background with your accent color.</p></div><div class="select-wrap base-select"><select id="customBase"><option value="dark">Dark base</option><option value="light">Light base</option></select><span>⌄</span></div></div></div>
               <div class="setting-row"><div><strong>Interface density</strong><p>Adjust the spacing throughout the app.</p></div><div class="density-options" role="group" aria-label="Interface density"><button type="button" data-density="comfortable" class="density-button active">Comfortable</button><button type="button" data-density="compact" class="density-button">Compact</button></div></div>
+              <div class="setting-row"><div><strong>Font style</strong><p>Choose the typeface used across the app.</p></div><div class="select-wrap"><select id="fontFamily"><option value="inter">Inter (default)</option><option value="poppins">Poppins</option><option value="nunito">Nunito</option><option value="space">Space Grotesk</option><option value="mono">JetBrains Mono</option><option value="serif">Merriweather</option><option value="access">Atkinson Hyperlegible</option></select><span>⌄</span></div></div>
+              <div class="setting-row"><div><strong>Text size</strong><p>Make text easier to read on small screens.</p></div><div class="density-options" role="group"><button type="button" class="density-button" data-fsize="s">S</button><button type="button" class="density-button" data-fsize="m">M</button><button type="button" class="density-button" data-fsize="l">L</button><button type="button" class="density-button" data-fsize="xl">XL</button></div></div>
+              <div class="setting-row"><div><strong>Language</strong><p>Language for menus and buttons.</p></div><div class="select-wrap"><select id="langSelect"><option value="en">English</option><option value="fil">Filipino</option><option value="es">Español</option></select><span>⌄</span></div></div>
+              <div class="setting-row"><div><strong>Assistive Touch</strong><p>Floating logo button that stays on every screen.</p></div><label class="wh-switch"><input type="checkbox" id="optAssist"/><i></i></label></div><div class="setting-row"><div><strong>Pop-up results</strong><p>Show a pop-up after each action.</p></div><label class="wh-switch"><input type="checkbox" id="optPopup"/><i></i></label></div><div class="setting-row"><div><strong>Loading effects</strong><p>Show a loading animation while keys are derived.</p></div><label class="wh-switch"><input type="checkbox" id="optLoader"/><i></i></label></div><div class="setting-row"><div><strong>Privacy shield</strong><p>Blur the screen when you leave the tab and clear passwords after inactivity.</p></div><label class="wh-switch"><input type="checkbox" id="optShield"/><i></i></label></div>
               <div class="settings-footer"><span id="settingsSaveState" class="save-state"><i></i> Preferences saved on this device</span><button id="resetSettings" class="secondary-button" type="button">Reset preferences</button></div>
             </section>
             <aside class="surface settings-aside"><div class="settings-aside-icon">✦</div><h3>Your settings stay local</h3><p>Appearance preferences are saved in this browser's local storage. They do not include the text you convert, your password, or your generated records.</p><div class="setting-mini-row"><span>Theme</span><strong id="currentThemeLabel">Dark</strong></div><div class="setting-mini-row"><span>Density</span><strong id="currentDensityLabel">Comfortable</strong></div></aside>

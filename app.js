@@ -3,7 +3,9 @@
 const ITERATIONS = 600000;
 const HASH_RECORD_FORMAT = 'WENHASH-HASH-1';
 const DIGEST_RECORD_FORMAT = 'WENHASH-DIGEST-1';
-const ENCRYPTION_RECORD_FORMAT = 'WENHASH-ENC-1';
+const ENCRYPTION_RECORD_FORMAT = 'WENHASH-ENC-2';
+const LEGACY_ENCRYPTION_FORMAT = 'WENHASH-ENC-1';
+const isEncFormat = (f) => f === ENCRYPTION_RECORD_FORMAT || f === LEGACY_ENCRYPTION_FORMAT;
 const BASE64_RECORD_FORMAT = 'WENHASH-BASE64-1';
 const HEX_RECORD_FORMAT = 'WENHASH-HEX-1';
 const MAX_TEXT_LENGTH = 20000;
@@ -139,10 +141,22 @@ async function derivePbkdf2Bytes(passwordOrText, salt, iterations = ITERATIONS) 
   return new Uint8Array(derived);
 }
 
-async function deriveEncryptionKey(password, salt, usage) {
+// Layer 1: password -> PBKDF2-SHA-512 (210k) hex. Layer 2: that hash -> PBKDF2-SHA-256 (600k) AES key.
+// The raw password is never used directly as key material in ENC-2 records.
+async function hardenPassword(password, salt) {
+  const c = getCrypto();
+  const material = await c.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
+  const tag = new TextEncoder().encode('WH-L1');
+  const layerSalt = new Uint8Array(salt.length + tag.length); layerSalt.set(salt); layerSalt.set(tag, salt.length);
+  const bits = await c.subtle.deriveBits({ name: 'PBKDF2', salt: layerSalt, iterations: 210000, hash: 'SHA-512' }, material, 512);
+  return encodeHex(new Uint8Array(bits));
+}
+
+async function deriveEncryptionKey(password, salt, usage, hardened = true) {
   const crypto = getCrypto();
+  const secret = hardened ? await hardenPassword(password, salt) : password;
   const passwordMaterial = await crypto.subtle.importKey(
-    'raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+    'raw', new TextEncoder().encode(secret), { name: 'PBKDF2' }, false, ['deriveKey']
   );
   return crypto.subtle.deriveKey(
     { name: 'PBKDF2', salt, iterations: ITERATIONS, hash: 'SHA-256' },
@@ -270,6 +284,7 @@ async function convertText() {
         format: ENCRYPTION_RECORD_FORMAT,
         algorithm: 'AES-256-GCM',
         keyDerivation: 'PBKDF2-HMAC-SHA-256',
+        passwordHardening: 'PBKDF2-SHA-512x210000 > PBKDF2-SHA-256x600000',
         iterations: ITERATIONS,
         saltBase64: bytesToBase64(salt),
         ivBase64: bytesToBase64(iv),
@@ -280,7 +295,7 @@ async function convertText() {
         output: JSON.stringify(record, null, 2), label: 'AES-256-GCM encrypted JSON', mode: 'AES-256-GCM', salt: 'Random · 16 bytes', encryption: 'AES-256-GCM', record,
         hint: 'Keep this encrypted JSON record and store its password separately. Use Reverse / Verify to decrypt it.'
       });
-      setNotice(notice, 'Message encrypted locally. Save the JSON record and keep its password separate. WenHash cannot recover a lost password.');
+      setNotice(notice, 'Message encrypted locally with double password hashing. Save the JSON record and keep its password separate. WenHash cannot recover a lost password.');
     }
   } catch (error) {
     setNotice(notice, error instanceof Error ? error.message : 'Transformation failed. Try again using a modern browser on HTTPS or localhost.', 'error');
@@ -312,7 +327,7 @@ async function decodeToText() {
     if (rawInput.startsWith('{')) {
       let record;
       try { record = JSON.parse(rawInput); } catch { throw new Error('This looks like JSON but it is not valid JSON.'); }
-      if (record && record.format === ENCRYPTION_RECORD_FORMAT) {
+      if (record && isEncFormat(record.format)) {
         $('decryptRecordInput').value = rawInput;
         selectReverseTab('decrypt');
         setNotice($('decryptMessage'), 'Encrypted WenHash record detected. Enter the original password above to decrypt it.');
@@ -445,7 +460,7 @@ async function decryptRecord() {
     const crypto = getCrypto();
     let record;
     try { record = JSON.parse(rawRecord); } catch { throw new Error('The record is not valid JSON. Paste the complete WenHash encrypted JSON.'); }
-    if (!record || record.format !== ENCRYPTION_RECORD_FORMAT || record.algorithm !== 'AES-256-GCM' || record.keyDerivation !== 'PBKDF2-HMAC-SHA-256' || record.iterations !== ITERATIONS || record.encoding !== 'base64') {
+    if (!record || !isEncFormat(record.format) || record.algorithm !== 'AES-256-GCM' || record.keyDerivation !== 'PBKDF2-HMAC-SHA-256' || record.iterations !== ITERATIONS || record.encoding !== 'base64') {
       throw new Error('Unsupported or modified metadata. Use a WenHash AES-256-GCM export.');
     }
     const salt = base64ToBytes(record.saltBase64, 'salt');
@@ -455,7 +470,7 @@ async function decryptRecord() {
       throw new Error('The record has an invalid salt, IV, or ciphertext size.');
     }
     button.querySelector('span:nth-child(2)').textContent = 'Deriving key…';
-    const key = await deriveEncryptionKey(password, salt, 'decrypt');
+    const key = await deriveEncryptionKey(password, salt, 'decrypt', record.format === ENCRYPTION_RECORD_FORMAT);
     button.querySelector('span:nth-child(2)').textContent = 'Decrypting…';
     const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv, tagLength: 128 }, key, ciphertext);
     const plaintext = new TextDecoder('utf-8', { fatal: true }).decode(decrypted);
@@ -506,7 +521,7 @@ function downloadTextFile(filename, text, type = 'application/json') {
 
 function exportCurrentRecord() {
   if (!currentRecord) return;
-  const suffix = currentRecord.format === ENCRYPTION_RECORD_FORMAT ? 'encrypted' : currentRecord.format === HASH_RECORD_FORMAT ? 'salted-hash' : currentRecord.format === BASE64_RECORD_FORMAT ? 'base64' : currentRecord.format === HEX_RECORD_FORMAT ? 'hex' : 'digest';
+  const suffix = isEncFormat(currentRecord.format) ? 'encrypted' : currentRecord.format === HASH_RECORD_FORMAT ? 'salted-hash' : currentRecord.format === BASE64_RECORD_FORMAT ? 'base64' : currentRecord.format === HEX_RECORD_FORMAT ? 'hex' : 'digest';
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   downloadTextFile(`wenhash-${suffix}-${timestamp}.json`, JSON.stringify(currentRecord, null, 2));
 }
